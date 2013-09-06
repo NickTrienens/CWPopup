@@ -7,6 +7,7 @@
 //
 
 #import "SamplePopupViewController.h"
+#import "UIViewController+CWPopup.h"
 
 @interface SamplePopupViewController ()
 
@@ -35,4 +36,9 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (IBAction)closeMyself:(id)sender {
+	[self dismissPopupViewControllerAnimated:YES completion:^{
+		
+	}];
+}
 @end

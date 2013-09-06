@@ -10,4 +10,6 @@
 
 @interface SamplePopupViewController : UIViewController
 
+- (IBAction)closeMyself:(id)sender;
+
 @end

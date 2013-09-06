@@ -12,7 +12,7 @@
 
 #define ANIMATION_TIME 0.5
 #define FADE_ALPHA 0.4
-
+NSString const *CWPopupParentKey = @"CWPopupParentkey";
 NSString const *CWPopupKey = @"CWPopupkey";
 NSString const *CWFadeViewKey = @"CWFadeViewKey";
 
@@ -25,9 +25,13 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 - (void)presentPopupViewController:(UIViewController *)viewControllerToPresent animated:(BOOL)flag completion:(void (^)(void))completion {
     // setup
     self.popupViewController = viewControllerToPresent;
+	viewControllerToPresent.popupParentViewController = self;
     CGRect frame = viewControllerToPresent.view.frame;
-    CGFloat x = ([UIScreen mainScreen].bounds.size.width - viewControllerToPresent.view.frame.size.width)/2;
-    CGFloat y =([UIScreen mainScreen].bounds.size.height - viewControllerToPresent.view.frame.size.height)/2;
+
+	CGFloat tmpNabrBarHeight = (self.navigationController.navigationBarHidden )?0:self.navigationController.navigationBar.bounds.size.height;
+	
+    CGFloat x = (self.view.bounds.size.width - viewControllerToPresent.view.frame.size.width)/2;
+    CGFloat y =(self.view.bounds.size.height - tmpNabrBarHeight - viewControllerToPresent.view.frame.size.height)/2;
     CGRect finalFrame = CGRectMake(x, y, frame.size.width, frame.size.height);
     // shadow setup
     viewControllerToPresent.view.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
@@ -62,7 +66,13 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 }
 
 - (void)dismissPopupViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion {
+	if(self.popupViewController == nil){
+		[self.popupParentViewController dismissPopupViewControllerAnimated:flag completion:completion];
+		return;
+	}
+	
     UIView *fadeView = objc_getAssociatedObject(self, &CWFadeViewKey);
+	
     if (flag) { // animate
         CGRect initialFrame = self.popupViewController.view.frame;
         [UIView animateWithDuration:ANIMATION_TIME delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
@@ -73,12 +83,15 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
         } completion:^(BOOL finished) {
             [self.popupViewController.view removeFromSuperview];
             [fadeView removeFromSuperview];
+			self.popupViewController.popupParentViewController = nil;
             self.popupViewController = nil;
+			
             [completion invoke];
         }];
     } else { // don't animate
         [self.popupViewController.view removeFromSuperview];
         [fadeView removeFromSuperview];
+		self.popupViewController.popupParentViewController = nil;
         self.popupViewController = nil; 
         fadeView = nil;
 
@@ -94,6 +107,16 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 
 - (UIViewController *)popupViewController {
     return objc_getAssociatedObject(self, &CWPopupKey);
+}
+
+#pragma mark - popupParentViewController getter/setter
+
+- (void)setPopupParentViewController:(UIViewController *)popupParentViewController {
+    objc_setAssociatedObject(self, &CWPopupParentKey, popupParentViewController, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (UIViewController *)popupParentViewController {
+    return objc_getAssociatedObject(self, &CWPopupParentKey);
 }
 
 @end
