@@ -48,6 +48,8 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
     fadeView.alpha = 0.0f;
     [self.view addSubview:fadeView];
     objc_setAssociatedObject(self, &CWFadeViewKey, fadeView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	[self.popupViewController viewWillAppear:flag];
+
     if (flag) { // animate
         CGRect initialFrame = CGRectMake(finalFrame.origin.x, [UIScreen mainScreen].bounds.size.height + viewControllerToPresent.view.frame.size.height/2, finalFrame.size.width, finalFrame.size.height);
         viewControllerToPresent.view.frame = initialFrame;
@@ -57,11 +59,15 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
             fadeView.alpha = FADE_ALPHA;
         } completion:^(BOOL finished) {
             [completion invoke];
+			[self.popupViewController viewDidAppear:YES];
+
         }];
     } else { // don't animate
         viewControllerToPresent.view.frame = finalFrame;
         [self.view addSubview:viewControllerToPresent.view];
         [completion invoke];
+		[self.popupViewController viewDidAppear:NO];
+
     }
 }
 
@@ -75,6 +81,7 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 	
     if (flag) { // animate
         CGRect initialFrame = self.popupViewController.view.frame;
+		[self.popupViewController viewWillDisappear:YES];
         [UIView animateWithDuration:ANIMATION_TIME delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             self.popupViewController.view.frame = CGRectMake(initialFrame.origin.x, [UIScreen mainScreen].bounds.size.height + initialFrame.size.height/2, initialFrame.size.width, initialFrame.size.height);
             // uncomment the line below to have slight rotation during the dismissal
@@ -89,6 +96,7 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
             [completion invoke];
         }];
     } else { // don't animate
+		[self.popupViewController viewWillDisappear:NO];
         [self.popupViewController.view removeFromSuperview];
         [fadeView removeFromSuperview];
 		self.popupViewController.popupParentViewController = nil;
