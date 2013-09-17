@@ -107,6 +107,12 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
     }
 }
 
+-(UIView*)fadeView{
+    UIView *fadeView = objc_getAssociatedObject(self, &CWFadeViewKey);
+	return fadeView;
+}
+
+
 #pragma mark - popupViewController getter/setter
 
 - (void)setPopupViewController:(UIViewController *)popupViewController {
