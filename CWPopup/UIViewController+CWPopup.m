@@ -24,6 +24,9 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 
 - (void)presentPopupViewController:(UIViewController *)viewControllerToPresent animated:(BOOL)flag completion:(void (^)(void))completion {
     // setup
+
+	NSAssert(self.popupViewController == nil, @"Trying to present a second popup");
+
     self.popupViewController = viewControllerToPresent;
 	viewControllerToPresent.popupParentViewController = self;
     CGRect frame = viewControllerToPresent.view.frame;
@@ -42,11 +45,13 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
     // rounded corners
     viewControllerToPresent.view.layer.cornerRadius = 5.0f;
     // black uiview
-    UIView *fadeView = [UIView new];
+    UIButton *fadeView = [UIButton new];
     fadeView.frame = [UIScreen mainScreen].bounds;
     fadeView.backgroundColor = [UIColor blackColor];
     fadeView.alpha = 0.0f;
     [self.view addSubview:fadeView];
+	
+	[fadeView addTarget:self action:@selector(closePopup) forControlEvents:UIControlEventTouchUpInside];
     objc_setAssociatedObject(self, &CWFadeViewKey, fadeView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 	[self.popupViewController viewWillAppear:flag];
 
@@ -74,6 +79,8 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 - (void)dismissPopupViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion {
 	if(self.popupViewController == nil){
 		[self.popupParentViewController dismissPopupViewControllerAnimated:flag completion:completion];
+	//	self.popupParentViewController.popupViewController = nil;
+		//self.popupParentViewController = nil;
 		return;
 	}
 	
@@ -91,6 +98,7 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
             [self.popupViewController.view removeFromSuperview];
             [fadeView removeFromSuperview];
 			self.popupViewController.popupParentViewController = nil;
+			self.popupParentViewController = nil;
             self.popupViewController = nil;
 			
             [completion invoke];
@@ -100,6 +108,7 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
         [self.popupViewController.view removeFromSuperview];
         [fadeView removeFromSuperview];
 		self.popupViewController.popupParentViewController = nil;
+		self.popupParentViewController = nil;
         self.popupViewController = nil; 
         fadeView = nil;
 
@@ -107,11 +116,14 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
     }
 }
 
--(UIView*)fadeView{
-    UIView *fadeView = objc_getAssociatedObject(self, &CWFadeViewKey);
+-(UIButton*)fadeView{
+    UIButton *fadeView = objc_getAssociatedObject(self, &CWFadeViewKey);
 	return fadeView;
 }
 
+-(void)closePopup{
+	[self dismissPopupViewControllerAnimated:YES completion:nil];
+}
 
 #pragma mark - popupViewController getter/setter
 
