@@ -24,13 +24,25 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 
 - (void)presentPopupViewController:(UIViewController *)viewControllerToPresent animated:(BOOL)flag completion:(void (^)(void))completion {
     // setup
+	[self presentPopupViewController:viewControllerToPresent withSize:CGSizeZero animated:flag completion:completion];
+	
+}
 
+- (void)presentPopupViewController:(UIViewController *)viewControllerToPresent withSize:(CGSize)inSize animated:(BOOL)flag completion:(void (^)(void))completion {
+	[self presentPopupViewController:viewControllerToPresent withSize:inSize tapOutsideToDismiss:YES animated:flag completion:completion];
+}
+
+- (void)presentPopupViewController:(UIViewController *)viewControllerToPresent withSize:(CGSize)inSize tapOutsideToDismiss:(BOOL)inTap animated:(BOOL)flag completion:(void (^)(void))completion {
+	
 	NSAssert(self.popupViewController == nil, @"Trying to present a second popup");
 
     self.popupViewController = viewControllerToPresent;
 	viewControllerToPresent.popupParentViewController = self;
     CGRect frame = viewControllerToPresent.view.frame;
-
+	if(!CGSizeEqualToSize(inSize , CGSizeZero)){
+		frame.size = inSize;
+		viewControllerToPresent.view.frame = frame;
+	}
 	CGFloat tmpNabrBarHeight = (self.navigationController.navigationBarHidden )?0:self.navigationController.navigationBar.bounds.size.height;
 	
     CGFloat x = (self.view.bounds.size.width - viewControllerToPresent.view.frame.size.width)/2;
@@ -41,18 +53,24 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
     viewControllerToPresent.view.layer.shadowColor = [UIColor blackColor].CGColor;
     viewControllerToPresent.view.layer.shadowRadius = 3.0f;
     viewControllerToPresent.view.layer.shadowOpacity = 0.8f;
-    viewControllerToPresent.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:viewControllerToPresent.view.layer.bounds].CGPath;
+//    viewControllerToPresent.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:viewControllerToPresent.view.layer.bounds].CGPath;
+	
+	[viewControllerToPresent.view setAutoresizingMask:UIViewAutoresizingFlexibleBottomMargin|UIViewAutoresizingFlexibleRightMargin |UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleLeftMargin];
+	
     // rounded corners
     viewControllerToPresent.view.layer.cornerRadius = 5.0f;
     // black uiview
     UIButton *fadeView = [UIButton new];
-    fadeView.frame = [UIScreen mainScreen].bounds;
+    fadeView.frame = self.view.bounds;
+	[fadeView setAutoresizingMask:UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth ];
     fadeView.backgroundColor = [UIColor blackColor];
     fadeView.alpha = 0.0f;
     [self.view addSubview:fadeView];
-	
-	[fadeView addTarget:self action:@selector(closePopup) forControlEvents:UIControlEventTouchUpInside];
+	if(inTap)
+		[fadeView addTarget:self action:@selector(closePopup) forControlEvents:UIControlEventTouchUpInside];
+
     objc_setAssociatedObject(self, &CWFadeViewKey, fadeView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+	
 	[self.popupViewController viewWillAppear:flag];
 
     if (flag) { // animate
@@ -74,6 +92,25 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 		[self.popupViewController viewDidAppear:NO];
 
     }
+}
+
+
+-(void)setPopupViewSize:(CGSize)inSize{
+	if(self.popupViewController == nil){
+		[self.popupParentViewController setPopupViewSize:inSize];
+		return;
+	}
+	CGRect frame = self.popupViewController.view.frame;
+	if(!CGSizeEqualToSize(inSize , CGSizeZero)){
+		frame.size = inSize;
+		self.popupViewController.view.frame = frame;
+	}
+	CGFloat x = (self.view.bounds.size.width - self.popupViewController.view.frame.size.width)/2;
+    CGFloat y =(self.view.bounds.size.height - self.popupViewController.view.frame.size.height)/2;
+    CGRect finalFrame = CGRectMake(x, y, frame.size.width, frame.size.height);
+	self.popupViewController.view.frame = finalFrame;
+	
+	
 }
 
 - (void)dismissPopupViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion {
