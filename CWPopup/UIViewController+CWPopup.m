@@ -33,6 +33,10 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 }
 
 - (void)presentPopupViewController:(UIViewController *)viewControllerToPresent withSize:(CGSize)inSize tapOutsideToDismiss:(BOOL)inTap animated:(BOOL)flag completion:(void (^)(void))completion {
+	[self presentPopupViewController:viewControllerToPresent withSize:inSize tapOutsideToDismiss:inTap animated:flag shadow:YES completion:completion];
+}
+
+- (void)presentPopupViewController:(UIViewController *)viewControllerToPresent withSize:(CGSize)inSize tapOutsideToDismiss:(BOOL)inTap animated:(BOOL)flag shadow:(BOOL)inShadow completion:(void (^)(void))completion {
 	
 	NSAssert(self.popupViewController == nil, @"Trying to present a second popup");
 
@@ -49,10 +53,13 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
     CGFloat y =(self.view.bounds.size.height - tmpNabrBarHeight - viewControllerToPresent.view.frame.size.height)/2;
     CGRect finalFrame = CGRectMake(x, y, frame.size.width, frame.size.height);
     // shadow setup
-    viewControllerToPresent.view.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
-    viewControllerToPresent.view.layer.shadowColor = [UIColor blackColor].CGColor;
-    viewControllerToPresent.view.layer.shadowRadius = 3.0f;
-    viewControllerToPresent.view.layer.shadowOpacity = 0.8f;
+	
+	if(inShadow){
+		viewControllerToPresent.view.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+		viewControllerToPresent.view.layer.shadowColor = [UIColor blackColor].CGColor;
+		viewControllerToPresent.view.layer.shadowRadius = 3.0f;
+		viewControllerToPresent.view.layer.shadowOpacity = 0.8f;
+	}
 //    viewControllerToPresent.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:viewControllerToPresent.view.layer.bounds].CGPath;
 	
 	[viewControllerToPresent.view setAutoresizingMask:UIViewAutoresizingFlexibleBottomMargin|UIViewAutoresizingFlexibleRightMargin |UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleLeftMargin];

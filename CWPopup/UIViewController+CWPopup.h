@@ -16,6 +16,7 @@
 - (void)presentPopupViewController:(UIViewController *)viewControllerToPresent animated:(BOOL)flag completion:(void (^)(void))completion;
 - (void)presentPopupViewController:(UIViewController *)viewControllerToPresent withSize:(CGSize)inSize animated:(BOOL)flag completion:(void (^)(void))completion;
 - (void)presentPopupViewController:(UIViewController *)viewControllerToPresent withSize:(CGSize)inSize tapOutsideToDismiss:(BOOL)inTap animated:(BOOL)flag completion:(void (^)(void))completion;
+- (void)presentPopupViewController:(UIViewController *)viewControllerToPresent withSize:(CGSize)inSize tapOutsideToDismiss:(BOOL)inTap animated:(BOOL)flag shadow:(BOOL)inShadow completion:(void (^)(void))completion;
 
 - (void)dismissPopupViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion;
 
