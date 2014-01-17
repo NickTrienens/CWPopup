@@ -133,27 +133,40 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
     if (flag) { // animate
         CGRect initialFrame = self.popupViewController.view.frame;
 		[self.popupViewController viewWillDisappear:YES];
-        [UIView animateWithDuration:ANIMATION_TIME delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+
+		[self viewWillAppear:YES];
+		UIView * tmpOldView = self.popupViewController.view;
+	
+
+		[UIView animateWithDuration:ANIMATION_TIME delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             self.popupViewController.view.frame = CGRectMake(initialFrame.origin.x, [UIScreen mainScreen].bounds.size.height + initialFrame.size.height/2, initialFrame.size.width, initialFrame.size.height);
             // uncomment the line below to have slight rotation during the dismissal
             // self.popupViewController.view.transform = CGAffineTransformMakeRotation(M_PI/6);
             fadeView.alpha = 0.0f;
-        } completion:^(BOOL finished) {
-            [self.popupViewController.view removeFromSuperview];
-            [fadeView removeFromSuperview];
+			
 			self.popupViewController.popupParentViewController = nil;
 			self.popupParentViewController = nil;
-            self.popupViewController = nil;
+			self.popupViewController = nil;
 			
+        } completion:^(BOOL finished) {
+            [tmpOldView removeFromSuperview];
+            [fadeView removeFromSuperview];
+			[self viewDidAppear:YES];
+
+						
             [completion invoke];
         }];
     } else { // don't animate
 		[self.popupViewController viewWillDisappear:NO];
-        [self.popupViewController.view removeFromSuperview];
-        [fadeView removeFromSuperview];
+		UIView * tmpOldView = self.popupViewController.view;
 		self.popupViewController.popupParentViewController = nil;
 		self.popupParentViewController = nil;
-        self.popupViewController = nil; 
+        self.popupViewController = nil;
+
+		[self viewWillAppear:NO];
+        [tmpOldView removeFromSuperview];
+        [fadeView removeFromSuperview];
+		[self viewDidAppear:NO];
         fadeView = nil;
 
         [completion invoke];
