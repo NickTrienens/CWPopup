@@ -36,7 +36,12 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 	[self presentPopupViewController:viewControllerToPresent withSize:inSize tapOutsideToDismiss:inTap animated:flag shadow:YES completion:completion];
 }
 
+
 - (void)presentPopupViewController:(UIViewController *)viewControllerToPresent withSize:(CGSize)inSize tapOutsideToDismiss:(BOOL)inTap animated:(BOOL)flag shadow:(BOOL)inShadow completion:(void (^)(void))completion {
+	[self presentPopupViewController:viewControllerToPresent withSize:inSize tapOutsideToDismiss:inTap animated:flag shadow:YES attachement:CWPopupAttachmentPositionCenter completion:completion];
+}
+
+- (void)presentPopupViewController:(UIViewController *)viewControllerToPresent withSize:(CGSize)inSize tapOutsideToDismiss:(BOOL)inTap animated:(BOOL)flag shadow:(BOOL)inShadow attachement:(CWPopupAttachmentPosition)inAttatchment completion:(void (^)(void))completion {
 	
 	NSAssert(self.popupViewController == nil, @"Trying to present a second popup");
 
@@ -52,6 +57,7 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
     CGFloat x = (self.view.bounds.size.width - viewControllerToPresent.view.frame.size.width)/2;
     CGFloat y =(self.view.bounds.size.height - tmpNabrBarHeight - viewControllerToPresent.view.frame.size.height)/2;
     CGRect finalFrame = CGRectMake(x, y, frame.size.width, frame.size.height);
+	finalFrame = [self adjustFrame:finalFrame forAttachmentType:inAttatchment];
     // shadow setup
 	
 	if(inShadow){
@@ -62,12 +68,12 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 	}
 //    viewControllerToPresent.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:viewControllerToPresent.view.layer.bounds].CGPath;
 	
-	[viewControllerToPresent.view setAutoresizingMask:UIViewAutoresizingFlexibleBottomMargin|UIViewAutoresizingFlexibleRightMargin |UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleLeftMargin];
+
 	
     // rounded corners
     viewControllerToPresent.view.layer.cornerRadius = 5.0f;
     // black uiview
-    UIButton *fadeView = [UIButton new];
+    UIButton *fadeView = [UIButton buttonWithType:UIButtonTypeCustom];
     fadeView.frame = self.view.bounds;
 	[fadeView setAutoresizingMask:UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth ];
     fadeView.backgroundColor = [UIColor blackColor];
@@ -99,6 +105,48 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 		[self.popupViewController viewDidAppear:NO];
 
     }
+}
+
+-(CGRect)adjustFrame:(CGRect)inFrame forAttachmentType:(CWPopupAttachmentPosition)inAttatchment{
+	
+	switch (inAttatchment) {
+		case CWPopupAttachmentPositionCenter:
+		{
+			//assume the frame is already centered with correct size
+			
+			[self.popupViewController.view setAutoresizingMask:UIViewAutoresizingFlexibleBottomMargin|UIViewAutoresizingFlexibleRightMargin |UIViewAutoresizingFlexibleTopMargin|UIViewAutoresizingFlexibleLeftMargin];
+			return inFrame;
+			break;
+		}
+			
+		case CWPopupAttachmentPositionFullHeightRightAligned:
+		{
+			
+			CGFloat x = self.view.bounds.size.width - self.popupViewController.view.frame.size.width;
+			CGFloat y = 0;
+			CGRect finalFrame = CGRectMake(x, y, inFrame.size.width, self.view.bounds.size.height);
+			
+			[self.popupViewController.view setAutoresizingMask:UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleLeftMargin];
+
+			return finalFrame;
+			break;
+		}
+		case CWPopupAttachmentPositionFullHeightLeftAligned:
+		{
+			
+			CGFloat x = 0;
+			CGFloat y = 0;
+			CGRect finalFrame = CGRectMake(x, y, inFrame.size.width, self.view.bounds.size.height);
+			
+			[self.popupViewController.view setAutoresizingMask:UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleRightMargin];
+			
+			return finalFrame;
+			break;
+		}
+		default:
+			break;
+	}
+	
 }
 
 
