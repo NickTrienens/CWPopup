@@ -43,6 +43,9 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 
 - (void)presentPopupViewController:(UIViewController *)viewControllerToPresent withSize:(CGSize)inSize tapOutsideToDismiss:(BOOL)inTap animated:(BOOL)flag shadow:(BOOL)inShadow attachement:(CWPopupAttachmentPosition)inAttatchment completion:(void (^)(void))completion {
 	
+	if(self.popupViewController != nil){
+		return;
+	}
 	NSAssert(self.popupViewController == nil, @"Trying to present a second popup");
 
     self.popupViewController = viewControllerToPresent;
@@ -171,8 +174,6 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 - (void)dismissPopupViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion {
 	if(self.popupViewController == nil){
 		[self.popupParentViewController dismissPopupViewControllerAnimated:flag completion:completion];
-	//	self.popupParentViewController.popupViewController = nil;
-		//self.popupParentViewController = nil;
 		return;
 	}
 	
