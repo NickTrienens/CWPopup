@@ -38,7 +38,7 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 
 
 - (void)presentPopupViewController:(UIViewController *)viewControllerToPresent withSize:(CGSize)inSize tapOutsideToDismiss:(BOOL)inTap animated:(BOOL)flag shadow:(BOOL)inShadow completion:(void (^)(void))completion {
-	[self presentPopupViewController:viewControllerToPresent withSize:inSize tapOutsideToDismiss:inTap animated:flag shadow:YES attachement:CWPopupAttachmentPositionCenter completion:completion];
+	[self presentPopupViewController:viewControllerToPresent withSize:inSize tapOutsideToDismiss:inTap animated:flag shadow:inShadow attachement:CWPopupAttachmentPositionCenter completion:completion];
 }
 
 - (void)presentPopupViewController:(UIViewController *)viewControllerToPresent withSize:(CGSize)inSize tapOutsideToDismiss:(BOOL)inTap animated:(BOOL)flag shadow:(BOOL)inShadow attachement:(CWPopupAttachmentPosition)inAttatchment completion:(void (^)(void))completion {
