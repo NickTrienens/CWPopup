@@ -86,7 +86,8 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 		[fadeView addTarget:self action:@selector(closePopup) forControlEvents:UIControlEventTouchUpInside];
 
     objc_setAssociatedObject(self, &CWFadeViewKey, fadeView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-	
+
+	[self viewWillDisappear:flag];
 	[self.popupViewController viewWillAppear:flag];
 
     if (flag) { // animate
@@ -99,13 +100,14 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
         } completion:^(BOOL finished) {
             [completion invoke];
 			[self.popupViewController viewDidAppear:YES];
-
+			[self viewDidDisappear:flag];
         }];
     } else { // don't animate
         viewControllerToPresent.view.frame = finalFrame;
         [self.view addSubview:viewControllerToPresent.view];
         [completion invoke];
 		[self.popupViewController viewDidAppear:NO];
+		[self viewDidDisappear:flag];
 
     }
 }
@@ -189,12 +191,9 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 
 		[UIView animateWithDuration:ANIMATION_TIME delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             self.popupViewController.view.frame = CGRectMake(initialFrame.origin.x, [UIScreen mainScreen].bounds.size.height + initialFrame.size.height/2, initialFrame.size.width, initialFrame.size.height);
-            // uncomment the line below to have slight rotation during the dismissal
-            // self.popupViewController.view.transform = CGAffineTransformMakeRotation(M_PI/6);
             fadeView.alpha = 0.0f;
 			
 			self.popupViewController.popupParentViewController = nil;
-			self.popupParentViewController = nil;
 			self.popupViewController = nil;
 			
         } completion:^(BOOL finished) {
@@ -209,7 +208,6 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 		[self.popupViewController viewWillDisappear:NO];
 		UIView * tmpOldView = self.popupViewController.view;
 		self.popupViewController.popupParentViewController = nil;
-		self.popupParentViewController = nil;
         self.popupViewController = nil;
 
 		[self viewWillAppear:NO];

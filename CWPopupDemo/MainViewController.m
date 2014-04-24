@@ -25,6 +25,24 @@
     return self;
 }
 
+-(void)viewDidAppear:(BOOL)animated{
+	
+	NSLog(@"viewDidAppear");
+}
+-(void)viewDidDisappear:(BOOL)animated{
+	NSLog(@"viewDidDisappear");
+	
+}
+-(void)viewWillAppear:(BOOL)animated{
+	NSLog(@"viewWillAppear");
+	
+}
+
+-(void)viewWillDisappear:(BOOL)animated{
+	NSLog(@"viewWillDisappear");
+	
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
