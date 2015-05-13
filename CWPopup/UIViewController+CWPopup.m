@@ -59,6 +59,13 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 	
     CGFloat x = (self.view.bounds.size.width - viewControllerToPresent.view.frame.size.width)/2;
     CGFloat y =(self.view.bounds.size.height - tmpNabrBarHeight - viewControllerToPresent.view.frame.size.height)/2;
+	
+	if([UIDevice systemVersion] < 8.0 && [UIDevice isIPhone]){
+		
+		y += 54;
+	}
+	
+	
     CGRect finalFrame = CGRectMake(x, y, frame.size.width, frame.size.height);
 	finalFrame = [self adjustFrame:finalFrame forAttachmentType:inAttatchment];
     // shadow setup
@@ -167,6 +174,12 @@ NSString const *CWFadeViewKey = @"CWFadeViewKey";
 	}
 	CGFloat x = (self.view.bounds.size.width - self.popupViewController.view.frame.size.width)/2;
     CGFloat y =(self.view.bounds.size.height - self.popupViewController.view.frame.size.height)/2;
+	
+	if([UIDevice systemVersion] < 8.0 && [UIDevice isIPhone]){
+		
+		y += 54;
+	}
+	
     CGRect finalFrame = CGRectMake(x, y, frame.size.width, frame.size.height);
 	self.popupViewController.view.frame = finalFrame;
 	
